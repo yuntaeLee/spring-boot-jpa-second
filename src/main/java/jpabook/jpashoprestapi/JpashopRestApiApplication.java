@@ -1,6 +1,7 @@
 package jpabook.jpashoprestapi;
 
 import com.p6spy.engine.spy.P6SpyOptions;
+import jpabook.jpashoprestapi.p6spy.P6spyPrettySqlFormatter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
