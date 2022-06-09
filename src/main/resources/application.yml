@@ -1,4 +1,3 @@
-
 spring:
   datasource:
     url: jdbc:h2:tcp://localhost/~/jpashop
@@ -11,10 +10,17 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        #        show_sql: true
+        default_batch_fetch_size: 1000
         format_sql: true
-        default_batch_fetch_size: 1000 #??? ??
 
-logging.level:
-  org.hibernate.SQL: debug
+#logging.level:
+#  org.hibernate.SQL: debug
 #  org.hibernate.type: trace
+
+#decorator:
+#  datasource:
+#    p6spy:
+#      enable-logging: true
+#      multiline: true
+#      logging: slf4j
+#      tracing.include-parameter-values: true
