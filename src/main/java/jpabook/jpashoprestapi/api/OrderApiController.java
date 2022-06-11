@@ -120,8 +120,9 @@ public class OrderApiController {
      *    ToMany관계는 최적화 하기 어려우므로 findOrderItems() 같은 별도의 메서드로 조회한다.
      */
     @GetMapping("/api/v4/orders")
-    public List<OrderQueryDto> ordersV4() {
-        return orderQueryRepository.findOrderQueryDtos();
+    public Result ordersV4() {
+        List<OrderQueryDto> result = orderQueryRepository.findOrderQueryDtos();
+        return new Result(result.size(), result);
     }
 
     @Getter
