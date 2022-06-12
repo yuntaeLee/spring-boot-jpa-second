@@ -6,6 +6,8 @@ import jpabook.jpashoprestapi.domain.OrderItem;
 import jpabook.jpashoprestapi.domain.OrderStatus;
 import jpabook.jpashoprestapi.repository.OrderRepository;
 import jpabook.jpashoprestapi.repository.OrderSearch;
+import jpabook.jpashoprestapi.repository.order.query.OrderFlatDto;
+import jpabook.jpashoprestapi.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashoprestapi.repository.order.query.OrderQueryDto;
 import jpabook.jpashoprestapi.repository.order.query.OrderQueryRepository;
 import lombok.AllArgsConstructor;
@@ -94,7 +96,7 @@ public class OrderApiController {
      * V3.1  엔티티를 조회해서 DTO로 변환 페이징 고려
      *  - ToOne 관계만 우선 모두 fetch join으로 최적화
      *  - 컬렉션 관계는 hibernate.default_batch_size, @BatchSize로 최적화
-     *    - 이 옵션을 사용하면 컬렉션이나, 프록시 객체를 한꺼번에 설정한 size 만큼 IN 쿼리로 조
+     *    - 이 옵션을 사용하면 컬렉션이나, 프록시 객체를 한꺼번에 설정한 size 만큼 IN 쿼리로 조회
      */
     @GetMapping("/api/v3.1/orders")
     public Result ordersV3_page(
@@ -124,6 +126,26 @@ public class OrderApiController {
         List<OrderQueryDto> result = orderQueryRepository.findOrderQueryDtos();
         return new Result(result.size(), result);
     }
+
+    @GetMapping("/api/v5/orders")
+    public Result ordersV5() {
+        List<OrderQueryDto> result = orderQueryRepository.findAllByDto_optimization();
+        return new Result(result.size(), result);
+    }
+
+    @GetMapping("/api/v6/orders")
+    public Result ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        List<OrderQueryDto> result = flats.stream()
+                .collect(Collectors.groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        Collectors.mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), Collectors.toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+                .collect(Collectors.toList());
+
+        return new Result(result.size(), result);
+    }
+
 
     @Getter
     @AllArgsConstructor
